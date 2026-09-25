@@ -1,0 +1,30 @@
+name: SecureFix Automated Security & Regression Audit
+
+on:
+  push:
+    branches: [ main, master, develop, fix/** ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  security-audit:
+    name: Autonomous Security Policy & Regression Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java Development Kit (JDK 17)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Dependency Vulnerability Check
+        run: |
+          echo '[SEC-AUDIT] Verifying Log4j dependencies...'
+          mvn dependency:tree -Dincludes=org.apache.logging.log4j
+
+      - name: Execute Security Regression Test Suite
+        run: mvn test -Dtest=PaymentAuditLoggerTest
